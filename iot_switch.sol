@@ -9,7 +9,7 @@ contract IoTSwitch{
   // user
   struct User {
     address user;
-    uint deadlint;
+    uint deadline;
     bool status;
   }
 
@@ -30,18 +30,18 @@ contract IoTSwitch{
   }
 
   // mapping number to struct
-  mapping (uint => User) mapUser public;
+  mapping (uint => User) private mapUser;
   uint public numPay;
 
   // constructor
-  function IoTSwitch(address _iot){
+  function IoTSwitch(address _iot) public{
     owner = msg.sender;
     numPay = 0;
     iot = _iot;
   }
 
   // to use iot machine
-  function useIot(address _user) public payable{
+  function useIot() public payable{
     require(msg.value == 1000000000000000000);
 
     mapUser[0].user = msg.sender;
@@ -51,7 +51,17 @@ contract IoTSwitch{
     numPay++;
   }
 
-  // to stop IoT machine 
+  // to stop IoT machine
+  function stopIot() public onlyIot{
+    if(now > mapUser[numPay].deadline){
+      mapUser[numPay].status = false;
+    }
+  }
+
+  // withdraw balance by onlyOwner
+  function withdraw() public onlyOwner(){
+    owner.transfer(address(this).balance);
+  }
 
 
 }
